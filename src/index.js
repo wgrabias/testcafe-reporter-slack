@@ -1,6 +1,9 @@
 import SlackMessage from './SlackMessage'
+import gitBranch from 'git-branch'
 
 export default function () {
+    const branchPromise = gitBranch()
+
     return {
 
         noColors: true,
@@ -9,8 +12,7 @@ export default function () {
             this.slack = new SlackMessage();
             this.startTime = startTime;
             this.testCount = testCount;
-
-            this.slack.sendMessage(`Starting testcafe ${startTime}. \n Running tests in: ${userAgents}`)
+            this.slack.addMessage(`Starting testcafe ${startTime}. \n Running tests in: ${userAgents}`)
         },
 
         reportFixtureStart (name, path) {
@@ -45,9 +47,15 @@ export default function () {
                 `${this.testCount - passed}/${this.testCount} failed`;
 
             footer = `\n*${footer}* (Duration: ${durationStr})`;
-
-            this.slack.addMessage(footer);
-            this.slack.sendTestReport(this.testCount - passed);
+            branchPromise
+                .then(() => {
+                    footer = `\nBranch Name: *${branchName}*\n`
+                })
+                .catch((err) => this.slack.addMessage(err))
+                .finally(() => {
+                    this.slack.addMessage(footer);
+                    this.slack.sendTestReport(this.testCount - passed);
+                })
         }
     }
 }

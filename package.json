@@ -38,8 +38,9 @@
     "testcafe": "^0.2.0-alpha"
   },
   "dependencies": {
-    "slack-node": "^0.1.8",
     "dotenv": "^4.0.0",
-    "envs": "^0.1.6"
+    "envs": "^0.1.6",
+    "git-branch": "^2.0.1",
+    "slack-node": "^0.1.8"
   }
 }
